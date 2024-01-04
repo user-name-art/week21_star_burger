@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 import json
 from django.templatetags.static import static
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -60,22 +61,24 @@ def product_list_api(request):
 @api_view(['POST'])
 def register_order(request):
     received_order = request.data
-    print(received_order)
 
-    order = Order.objects.create(
-        first_name=received_order['firstname'],
-        last_name=received_order['lastname'],
-        phonenumber=received_order['phonenumber'],
-        address=received_order['address']
-    )
-
-    products = Product.objects.available()
-
-    for product in received_order['products']:
-        OrderedProduct.objects.create(
-            product=products.get(id=product['product']),
-            quantity=product['quantity'],
-            order=order
+    if 'products' in received_order and isinstance(received_order['products'], list) and received_order['products']:
+        order = Order.objects.create(
+            first_name=received_order['firstname'],
+            last_name=received_order['lastname'],
+            phonenumber=received_order['phonenumber'],
+            address=received_order['address']
         )
+
+        products = Product.objects.available()
+
+        for product in received_order['products']:
+            OrderedProduct.objects.create(
+                product=products.get(id=product['product']),
+                quantity=product['quantity'],
+                order=order
+            )
+    else:
+        return Response({'error': 'products must be non-empty list'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({})
