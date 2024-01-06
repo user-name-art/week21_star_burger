@@ -12,7 +12,7 @@ import phonenumbers
 
 
 class OrderedProductSerializer(ModelSerializer):
-    quantity = CharField(source='count')
+    quantity = CharField()
 
     class Meta:
         model = OrderedProduct
@@ -82,8 +82,6 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    print(serializer.validated_data)
-
     order = Order.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
@@ -94,7 +92,7 @@ def register_order(request):
     for serialize_product in serializer.validated_data['products']:
         OrderedProduct.objects.create(
             product=serialize_product['product'],
-            quantity=serialize_product['count'],
+            quantity=serialize_product['quantity'],
             order=order
         )
 
