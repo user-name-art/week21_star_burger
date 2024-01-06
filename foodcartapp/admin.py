@@ -115,4 +115,4 @@ class OrderedProductsInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderedProductsInline]
-    list_display = ['first_name', 'last_name', 'phonenumber']
+    list_display = ['firstname', 'lastname', 'phonenumber']
