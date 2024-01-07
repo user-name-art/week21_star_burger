@@ -1,30 +1,11 @@
 from django.http import JsonResponse
-import json
 from django.templatetags.static import static
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import CharField
 
-from .models import Product, Order, OrderedProduct
-import phonenumbers
-
-
-class OrderedProductSerializer(ModelSerializer):
-    quantity = CharField()
-
-    class Meta:
-        model = OrderedProduct
-        fields = ['product', 'quantity']
-
-
-class OrderSerializer(ModelSerializer):
-    products = OrderedProductSerializer(many=True, allow_empty=False)
-
-    class Meta:
-        model = Order
-        fields = ['firstname', 'lastname', 'phonenumber', 'address', 'products']
+from .models import Product
+from .serializer import OrderSerializer
 
 
 def banners_list_api(request):
@@ -81,19 +62,6 @@ def product_list_api(request):
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+    serializer.save()
 
-    order = Order.objects.create(
-        firstname=serializer.validated_data['firstname'],
-        lastname=serializer.validated_data['lastname'],
-        phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address']
-    )
-
-    for serialize_product in serializer.validated_data['products']:
-        OrderedProduct.objects.create(
-            product=serialize_product['product'],
-            quantity=serialize_product['quantity'],
-            order=order
-        )
-
-    return Response({}, status=status.HTTP_201_CREATED)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
