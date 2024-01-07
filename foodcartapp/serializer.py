@@ -23,10 +23,11 @@ class OrderSerializer(ModelSerializer):
         )
 
         for serialize_product in validated_data['products']:
-            OrderedProduct.objects.create(
+            order.products.create(
                 product=serialize_product['product'],
                 quantity=serialize_product['quantity'],
-                order=order
+                order=order,
+                price=serialize_product['product'].price
             )
 
         return order
