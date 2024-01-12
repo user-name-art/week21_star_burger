@@ -140,6 +140,10 @@ class Order(models.Model):
         (3, 'Доставка'),
         (4, 'Выполнен'),
     )
+    PAYMENT_ORDER = (
+        (1, 'Наличные'),
+        (2, 'Электронно'),
+    )
 
     firstname = models.CharField(
         max_length=20,
@@ -163,10 +167,16 @@ class Order(models.Model):
         default=1,
         db_index=True
     )
+    payment_method = models.IntegerField(
+        verbose_name='способ оплаты',
+        choices=PAYMENT_ORDER,
+        null=True,
+        db_index=True
+    )
     comment = models.TextField('Комментарий', blank=True)
     created_at = models.DateTimeField(
         verbose_name='время создания заказа',
-        default=timezone.now(),
+        default=timezone.now,
         db_index=True
     )
     processed_at = models.DateTimeField(
