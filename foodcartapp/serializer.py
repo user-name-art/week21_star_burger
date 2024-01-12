@@ -12,7 +12,11 @@ class OrderedProductSerializer(ModelSerializer):
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderedProductSerializer(many=True, allow_empty=False, write_only=True)
+    products = OrderedProductSerializer(
+        many=True,
+        allow_empty=False,
+        write_only=True
+    )
 
     def create(self, validated_data):
         order = Order.objects.create(
@@ -34,4 +38,10 @@ class OrderSerializer(ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['firstname', 'lastname', 'phonenumber', 'address', 'products']
+        fields = [
+            'firstname',
+            'lastname',
+            'phonenumber',
+            'address',
+            'products',
+        ]
