@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -8,7 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant, Order
+from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 
 
 class Login(forms.Form):
@@ -92,7 +93,28 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.order_price().prefetch_related('products')
+    orders = Order.objects.order_price().prefetch_related('products__product__menu_items__restaurant')
+    available_menu = RestaurantMenuItem.objects.prefetch_related('restaurant').prefetch_related('product').filter(availability=True)
+
+    products_in_restaurant = defaultdict(set)
+    for item in available_menu:
+        products_in_restaurant[item.restaurant].add(item.product)
+    print(products_in_restaurant)
+    print()
+    for order in orders:
+        products_in_order = {product.product for product in order.products.all()}
+        print(products_in_order)
+        print()
+        restaurants = []
+        for restaurant, restaurant_products in products_in_restaurant.items():
+            if not (products_in_order - restaurant_products):
+                restaurants.append(
+                    {'restaurant': restaurant.name})
+        print(restaurants)
+        print()
+        order.restaurants = restaurants
+
+
     return render(request, template_name='order_items.html', context={
         'order_items': orders,
     })

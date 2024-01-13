@@ -191,6 +191,14 @@ class Order(models.Model):
         blank=True,
         db_index=True
     )
+    designated_restaurant = models.ForeignKey(
+        Restaurant,
+        verbose_name='назваченный ресторан',
+        related_name='restaurant',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     objects = OrderQuerySet.as_manager()
 
