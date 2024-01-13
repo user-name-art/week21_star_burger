@@ -202,6 +202,20 @@ class Order(models.Model):
 
     objects = OrderQuerySet.as_manager()
 
+    def get_available_restaurants(self):
+        restaurants = None
+        for product in self.products.all():
+            product_restaurants = {item.restaurant for item in product.available_restaurants() if item.availability}
+            if restaurants is None:
+                restaurants = product_restaurants
+            elif not restaurants:
+                return []
+            else:
+                restaurants &= product_restaurants
+
+        return list(restaurants)
+
+
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
@@ -233,6 +247,9 @@ class OrderedProduct(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)]
     )
+
+    def available_restaurants(self):
+        return self.product.menu_items.all()
 
     class Meta:
         verbose_name = 'блюдо в заказе'

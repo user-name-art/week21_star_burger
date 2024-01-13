@@ -38,20 +38,25 @@
         <td>{{item.address}}</td>
         <td>{{item.comment}}</td>
         <td>
-          {% if item.designated_restaurant %}
-            Заказ готовит {{item.designated_restaurant}}
+          {% if item.responsible_restaurant %}
+            Готовит: {{ item.responsible_restaurant.name }}
           {% else %}
-            {% if item.restaurants %}
-              <details>
-                <summary>Заказ могут приготовить рестораны:</summary>
-                {% for restaurant in item.restaurants %}
-                  <li>{{ restaurant.restaurant }}
-                  </li>
-                {% endfor %}
-              </details>
-            {% else %}
-              Ни один ресторан не может приготовить такой заказ
-            {% endif %}
+            {% with restaurants=item.get_available_restaurants %}
+              {% if restaurants %}
+                <details>
+                  <summary>Может быть приготовлен:</summary>
+                  <p>
+                    <ul>
+                      {% for restaurant in restaurants %}
+                      <li>{{ restaurant.name }}</li>
+                      {% endfor %}
+                    </ul>
+                  </p>
+                </details>
+              {% else %}
+                Ни один ресторан не может приготовить такой заказ
+              {% endif %}
+            {% endwith %}
           {% endif %}
         </td>
         <td><a href="{% url 'admin:foodcartapp_order_change' item.id %}?next={{ request.path|urlencode:'' }}">Редактировать</a></td>
