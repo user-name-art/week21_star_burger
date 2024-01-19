@@ -10,7 +10,7 @@ from django.contrib.auth import views as auth_views
 
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
-from .geo import fetch_coordinates
+from .geo import fetch_coordinates, get_coordinates_from_db_or_yandex
 from geopy import distance
 import requests
 
@@ -99,18 +99,14 @@ def view_orders(request):
     orders = Order.objects.prefetch_related('products__product__menu_items__restaurant').order_price()
 
     for order in orders:
-        try:
-            order_coordinates = fetch_coordinates(order.address)
-        except requests.exceptions.HTTPError:
-            order_coordinates = None
+        order_coordinates = get_coordinates_from_db_or_yandex(order.address)
 
         available_restaurants_with_distance = []
         available_restaurants = order.get_available_restaurants()
+
         for restaurant in available_restaurants:
-            try:
-                restaurant_coordnates = fetch_coordinates(restaurant.address)
-            except requests.exceptions.HTTPError:
-                restaurant_coordnates = None
+            restaurant_coordnates = get_coordinates_from_db_or_yandex(restaurant.address)
+
             if restaurant_coordnates or order_coordinates:
                 available_restaurants_with_distance.append(
                     {'name': restaurant.name,
@@ -120,7 +116,10 @@ def view_orders(request):
                         {'name': restaurant.name,
                          'distance_to_client': 'не удалось определить координаты'})
 
-        order.available_restaurants = sorted(available_restaurants_with_distance, key=lambda restaurant: restaurant['distance_to_client'])
+        order.available_restaurants = sorted(
+            available_restaurants_with_distance,
+            key=lambda restaurant: restaurant['distance_to_client']
+        )
 
     return render(request, template_name='order_items.html', context={
         'order_items': orders,

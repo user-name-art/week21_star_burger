@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+from addressesapp.models import Address
 
 
 def fetch_coordinates(address):
@@ -19,3 +20,18 @@ def fetch_coordinates(address):
     most_relevant = found_places[0]
     lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
     return lon, lat
+
+
+def get_coordinates_from_db_or_yandex(address):
+    try:
+        address = Address.objects.get(address=address)
+        lat, lon = address.lat, address.lon
+    except Address.DoesNotExist:
+        try:
+            lon, lat = fetch_coordinates(address)
+            address = Address.objects.create(address=address,
+                                             lat=lat,
+                                             lon=lon)
+        except requests.exceptions.HTTPError:
+            lat, lon = None, None
+    return lat, lon

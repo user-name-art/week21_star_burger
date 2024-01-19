@@ -215,7 +215,6 @@ class Order(models.Model):
 
         return list(restaurants)
 
-
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
