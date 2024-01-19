@@ -1,4 +1,3 @@
-from collections import defaultdict
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -8,11 +7,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-
-from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
-from .geo import fetch_coordinates, get_coordinates_from_db_or_yandex
-from geopy import distance
-import requests
+from foodcartapp.models import Product, Restaurant, Order
+from .utils import get_coordinates_from_db_or_yandex
+from geopy.distance import distance
 
 
 class Login(forms.Form):
@@ -96,7 +93,9 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.prefetch_related('products__product__menu_items__restaurant').order_price()
+    orders = Order.objects.exclude(status=4) \
+                          .prefetch_related('products__product__menu_items__restaurant') \
+                          .order_price()
 
     for order in orders:
         order_coordinates = get_coordinates_from_db_or_yandex(order.address)
@@ -110,7 +109,7 @@ def view_orders(request):
             if restaurant_coordnates or order_coordinates:
                 available_restaurants_with_distance.append(
                     {'name': restaurant.name,
-                     'distance_to_client': round(distance.distance(order_coordinates, restaurant_coordnates).km, 3)})
+                     'distance_to_client': round(distance(order_coordinates, restaurant_coordnates).km, 3)})
             else:
                 available_restaurants_with_distance.append(
                         {'name': restaurant.name,
