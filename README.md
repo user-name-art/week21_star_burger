@@ -55,9 +55,10 @@ pip install -r requirements.txt
 ```
 
 Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
-```sh
-SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
-YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
+
+- SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
+
+- YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
 ```
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
