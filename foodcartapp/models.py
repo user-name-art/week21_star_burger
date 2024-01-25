@@ -135,14 +135,14 @@ class OrderQuerySet(models.QuerySet):
 
 class Order(models.Model):
     STATUS_ORDER = (
-        (1, 'Необработанный'),
-        (2, 'Готовится'),
-        (3, 'Доставка'),
-        (4, 'Выполнен'),
+        ('unprocessed', 'Необработанный'),
+        ('prepare', 'Готовится'),
+        ('is_delivered', 'Доставка'),
+        ('done', 'Выполнен'),
     )
     PAYMENT_ORDER = (
-        (1, 'Наличные'),
-        (2, 'Электронно'),
+        ('cash', 'Наличные'),
+        ('online', 'Электронно'),
     )
 
     firstname = models.CharField(
@@ -158,14 +158,16 @@ class Order(models.Model):
         max_length=50,
         verbose_name='адрес'
     )
-    status = models.IntegerField(
+    status = models.CharField(
         verbose_name='статус заказа',
+        max_length=50,
         choices=STATUS_ORDER,
-        default=1,
+        default='unprocessed',
         db_index=True
     )
-    payment_method = models.IntegerField(
+    payment_method = models.CharField(
         verbose_name='способ оплаты',
+        max_length=50,
         choices=PAYMENT_ORDER,
         null=True,
         db_index=True
