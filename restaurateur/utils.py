@@ -26,12 +26,15 @@ def get_coordinates_from_db_or_yandex(address):
     try:
         address = Address.objects.get(address=address)
         lat, lon = address.lat, address.lon
+        return lat, lon
     except Address.DoesNotExist:
-        try:
-            lon, lat = fetch_coordinates(address)
-            address = Address.objects.create(address=address,
-                                             lat=lat,
-                                             lon=lon)
-        except requests.exceptions.HTTPError:
-            lat, lon = None, None
+        pass
+
+    try:
+        lon, lat = fetch_coordinates(address)
+        address = Address.objects.create(address=address,
+                                         lat=lat,
+                                         lon=lon)
+    except requests.exceptions.HTTPError:
+        lat, lon = None, None
     return lat, lon
