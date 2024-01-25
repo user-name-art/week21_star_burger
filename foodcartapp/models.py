@@ -147,19 +147,16 @@ class Order(models.Model):
 
     firstname = models.CharField(
         max_length=20,
-        verbose_name='имя',
-        null=False
+        verbose_name='имя'
     )
     lastname = models.CharField(
         max_length=20,
-        verbose_name='фамилия',
-        null=False
+        verbose_name='фамилия'
     )
     phonenumber = PhoneNumberField('телефон', db_index=True)
     address = models.CharField(
         max_length=50,
-        verbose_name='адрес',
-        null=False
+        verbose_name='адрес'
     )
     status = models.IntegerField(
         verbose_name='статус заказа',
