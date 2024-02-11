@@ -59,6 +59,8 @@ pip install -r requirements.txt
 - SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
 
 - YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
+- ROLLBAR_ACCESS_TOKEN — токен для Rollbar. [Подробнее](https://docs.rollbar.com/docs/getting-started).
+- ENVIRONMENT — название окружения. Например, development или production.
 ```
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
