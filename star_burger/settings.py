@@ -126,14 +126,14 @@ INTERNAL_IPS = [
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "bundles"),
+    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'bundles'),
 ]
 
 
 ROLLBAR = {
-    'access_token': env.str('ROLLBAR_ACCESS_TOKEN'),
-    'environment': env.str('ENVIRONMENT'),
+    'access_token': env.str('ROLLBAR_ACCESS_TOKEN', ''),
+    'environment': env.str('ENVIRONMENT', ''),
     'branch': 'main',
     'root': BASE_DIR,
 }
