@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    restart: always
+    image: postgres:16.1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    container_name: db
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=burger
+      - POSTGRES_PASSWORD=burger
+      - POSTGRES_DB=starburger
+
+  frontend:
+    restart: always
+    volumes:
+      - ./:/app
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev.frontend
+    command: ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+
+  django:
+    restart: always
+    volumes:
+      - ./:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: django
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev.backend
+    env_file:
+      - ./.env.dev
+    ports:
+      - '8001:8000'
+    depends_on:
+      - db
+      - frontend
+
+volumes:
+  postgres_data:
