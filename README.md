@@ -140,6 +140,47 @@ Parcel будет следить за файлами в каталоге `bundle
 
 **Сбросьте кэш браузера <kbd>Ctrl-F5</kbd>.** Браузер при любой возможности старается кэшировать файлы статики: CSS, картинки и js-код. Порой это приводит к странному поведению сайта, когда код уже давно изменился, но браузер этого не замечает и продолжает использовать старую закэшированную версию. В норме Parcel решает эту проблему самостоятельно. Он следит за пересборкой фронтенда и предупреждает JS-код в браузере о необходимости подтянуть свежий код. Но если вдруг что-то у вас идёт не так, то начните ремонт со сброса браузерного кэша, жмите <kbd>Ctrl-F5</kbd>.
 
+## Как запустить dev-версию сайта с помощью Docker
+
+Скачайте код:
+```sh
+git clone https://github.com/devmanorg/star-burger.git
+```
+
+Перейдите в каталог проекта:
+```sh
+cd star-burger
+```
+
+Установите [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/), если этого ещё не сделали.
+
+Создайте файл `.env.dev` в каталоге `star_burger/` и положите в него такой код:
+
+- SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
+- YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
+- ROLLBAR_ACCESS_TOKEN — токен для Rollbar. [Подробнее](https://docs.rollbar.com/docs/getting-started).
+- ENVIRONMENT — название окружения. Например, development или production.
+- DEBUG — режим отладки. Можно не указывать, по умолчанию False.
+
+Следующие параметры не явлюятся обязательными, однако при необходимости их можно определить:
+
+- POSTGRES_DB=starburger_db
+- POSTGRES_PASSWORD=password
+- POSTGRES_USER=admin
+- SQL_ENGINE=django.db.backends.postgresql
+- SQL_HOST=db
+- SQL_PORT=5432
+
+Соберите образы и запустите контейнеризированное приложение:
+```
+docker compose -f docker-compose.dev.yml up -d
+```
+Создайте структуру базы данных:
+```
+docker exec -t django python manage.py migrate
+```
+
+Откройте сайт в браузере по адресу [http://127.0.0.1:8001/](http://127.0.0.1:8001/).
 
 ## Как запустить prod-версию сайта
 
@@ -150,7 +191,7 @@ Parcel будет следить за файлами в каталоге `bundle
 ```
 
 Настроить бэкенд: создать файл `.env` в каталоге `star_burger/` со следующими настройками:
-
+```
 - SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
 - YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
 - ROLLBAR_ACCESS_TOKEN — токен для Rollbar. [Подробнее](https://docs.rollbar.com/docs/getting-started).
@@ -158,8 +199,6 @@ Parcel будет следить за файлами в каталоге `bundle
 - DB_URL — подключение к базе данных. Например, postgres://user:password@127.0.0.1:5432/starburger
 - DEBUG — режим отладки. Можно не указывать, по умолчанию False.
 ```
-
-
 
 Запустить скрипт:
 ```

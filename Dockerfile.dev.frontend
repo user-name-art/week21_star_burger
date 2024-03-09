@@ -1,0 +1,15 @@
+# pull official base image
+FROM node:16.16.0-slim
+
+# set work directory
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm ci --dev
+
+RUN npm install -g parcel@latest
+
+COPY bundles-src bundles-src
+
+CMD ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
