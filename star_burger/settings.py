@@ -88,9 +88,14 @@ MEDIA_URL = '/media/'
 DB_URL = env('DB_URL')
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=DB_URL
-    )
+    'default': {
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('POSTGRES_DB', '{}/db.sqlite3'.format(BASE_DIR)),
+        'USER': os.environ.get('POSTGRES_USER', 'user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
+        'HOST': os.environ.get('SQL_HOST', 'localhost'),
+        'PORT': os.environ.get('SQL_PORT', '5432'),
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
