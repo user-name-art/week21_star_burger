@@ -9,10 +9,8 @@ services:
     container_name: db
     ports:
       - '5432:5432'
-    environment:
-      - POSTGRES_USER=burger
-      - POSTGRES_PASSWORD=burger
-      - POSTGRES_DB=starburger
+    env_file:
+      - ./.env.dev
 
   frontend:
     restart: always
