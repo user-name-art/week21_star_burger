@@ -2,26 +2,30 @@
 
 set -e
 
-echo "Star-burger deploy started."
+echo "Check repo updates"
+git pull
 
-cd /opt/week21_star_burger/
-git pull git@github.com:user-name-art/week21_star_burger.git
-source ./.venv/bin/activate
-pip install -r requirements.txt
-npm ci --dev
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
-python manage.py collectstatic --noinput
-python manage.py migrate --noinput
-sudo systemctl restart star-burger.service
+echo "Preparing frontend"
+sudo docker build -t star-burger_frontend -f dockerfiles/Dockerfile.frontend .
+sudo docker run --rm -v $(pwd)/bundles:/app/bundles star-burger_frontend
+
+echo "Preparing backend"
+sudo docker-compose -f docker-compose.prod.yml up -d
+sudo docker exec -t django python manage.py migrate
+sudo docker cp django:/app/staticfiles .
+
+echo "Cleaning unused docker items"
+sudo docker system prune -f
+
 sudo systemctl reload nginx
 
 last_commit=$(git log -1 --pretty=format:'%H')
 commit_author=$(git log -1 --pretty=format:'%an')
-source .env
+source .env.prod
 
 curl -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
      -H "Content-Type: application/json" \
      -X POST 'https://api.rollbar.com/api/1/deploy' \
-     -d '{"environment": "production", "revision": "'"$last_commit"'", "rollbar_name": "art.gilyazov", "local_username": "'"$commit_author"'", "comment": "star burger deployment", "status>
+     -d '{"environment": "production", "revision": "'"$last_commit"'", "rollbar_name": "art.gilyazov", "local_username": "'"$commit_author"'", "comment": "star burger deployment"}'
 
 echo "Deploy successfully finished."
