@@ -6,7 +6,7 @@ echo "Check repo updates"
 git pull
 
 echo "Preparing frontend"
-sudo docker build -t star-burger_frontend -f dockerfiles/Dockerfile.frontend .
+sudo docker build -t star-burger_frontend -f Dockerfile.prod.frontend .
 sudo docker run --rm -v $(pwd)/bundles:/app/bundles star-burger_frontend
 
 echo "Preparing backend"
