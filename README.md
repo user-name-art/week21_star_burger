@@ -182,27 +182,57 @@ docker exec -t django python manage.py migrate
 
 Откройте сайт в браузере по адресу [http://127.0.0.1:8001/](http://127.0.0.1:8001/).
 
-## Как запустить prod-версию сайта
+## Как запустить prod-версию сайта с помощью Docker
 
-Собрать фронтенд:
-
+Скачайте код:
 ```sh
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+git clone https://github.com/devmanorg/star-burger.git
 ```
 
-Настроить бэкенд: создать файл `.env` в каталоге `star_burger/` со следующими настройками:
+Перейдите в каталог проекта:
+```sh
+cd star-burger
+```
+
+Установите [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/), если этого ещё не сделали.
+
+Создайте файл `.env.prod` в каталоге `star_burger/` и положите в него такой код:
 ```
 - SECRET_KEY — секретный ключ проекта. [Подробнее](https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key).
 - YANDEX_GEO_API_KEY — ключ Яндекс-геокодера для расчета расстояния от ресторана до клиента. [Подробнее](https://developer.tech.yandex.ru/services).
 - ROLLBAR_ACCESS_TOKEN — токен для Rollbar. [Подробнее](https://docs.rollbar.com/docs/getting-started).
 - ENVIRONMENT — название окружения. Например, development или production.
-- DB_URL — подключение к базе данных. Например, postgres://user:password@127.0.0.1:5432/starburger
 - DEBUG — режим отладки. Можно не указывать, по умолчанию False.
+- ALLOWED_HOSTS — в соответствии с [документацией](https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts) Django.
+- POSTGRES_DB — имя базы данных.
+- POSTGRES_PASSWORD — пароль базы данных.
+- POSTGRES_USER — пользователь базы данных.
+- SQL_ENGINE — тип базы данных.
+- SQL_HOST — имя контейнера с базой данных.
+- SQL_PORT — порт для подключения к базе данных, по умолчанию 5432.
+
 ```
 
-Запустить скрипт:
+Запустите скрипт деплоя:
 ```
 ./deploy_star_burger.sh
+```
+Также понадобится настроить nginx. Пример:
+```
+server {
+    server_name <site_ip_address>;
+    location / {
+        include '/etc/nginx/proxy_params';
+        proxy_pass http://127.0.0.1:8080/;
+    }
+    location /static/ {
+        alias /<path_to_django_app>/staticfiles/;
+    }
+    location /media/ {
+        alias /<path_to_django_app>/media/;
+    }
+}
+
 ```
 
 ## Цели проекта
