@@ -8,7 +8,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     container_name: db
     ports:
-      - '5432:5432'
+      - '5433:5432'
     env_file:
       - ./.env.dev
 
@@ -18,7 +18,7 @@ services:
       - ./:/app
     build:
       context: ./
-      dockerfile: Dockerfile.dev.frontend
+      dockerfile: frontend/Dockerfile.dev.frontend
     command: ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
 
   django:
@@ -29,7 +29,7 @@ services:
     container_name: django
     build:
       context: ./
-      dockerfile: Dockerfile.dev.backend
+      dockerfile: backend/Dockerfile.dev.backend
     env_file:
       - ./.env.dev
     ports:
