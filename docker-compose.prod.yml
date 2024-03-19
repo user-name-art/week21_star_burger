@@ -29,7 +29,16 @@ services:
     depends_on:
       - db
 
+  frontend:
+    container_name: frontend
+    build:
+      context: ./
+      dockerfile: frontend/Dockerfile.prod.frontend
+    volumes:
+      - bundles_volume:/frontend/bundles
+
 volumes:
   static_volume:
   postgres_data:
   media:
+  bundles_volume:
